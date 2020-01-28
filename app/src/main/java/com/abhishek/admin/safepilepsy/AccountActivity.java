@@ -1,5 +1,6 @@
 package com.abhishek.admin.safepilepsy;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
@@ -8,18 +9,25 @@ import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.karumi.dexter.Dexter;
 import com.karumi.dexter.PermissionToken;
 import com.karumi.dexter.listener.PermissionDeniedResponse;
 import com.karumi.dexter.listener.PermissionGrantedResponse;
 import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.single.PermissionListener;
+
+import java.io.IOException;
 
 public class AccountActivity extends AppCompatActivity {
 
@@ -88,7 +96,29 @@ public class AccountActivity extends AppCompatActivity {
         AccountActivity.this.runOnUiThread(new Runnable() {
             @Override
             public void run() {
+                Log.e("Out",value);
                 txt_location.setText(value);
+            }
+        });
+
+    }
+
+    public void storeToFireBase(final Double Lat, final Double Long) {
+
+
+        LocationHelper helper = new LocationHelper(Lat, Long);
+
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        DatabaseReference myRef = database.getReference("Current Location");
+
+        myRef.setValue(helper).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                if (task.isSuccessful()) {
+                    Toast.makeText(AccountActivity.this, "Location stored", Toast.LENGTH_SHORT);
+                } else {
+                    Toast.makeText(AccountActivity.this, "Location not stored", Toast.LENGTH_SHORT);
+                }
             }
         });
 

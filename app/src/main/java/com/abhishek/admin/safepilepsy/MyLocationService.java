@@ -10,11 +10,18 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.google.android.gms.location.LocationResult;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.database.FirebaseDatabase;
 
 import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import androidx.annotation.NonNull;
+
+import static android.widget.Toast.LENGTH_SHORT;
 
 public class MyLocationService extends BroadcastReceiver {
 
@@ -33,15 +40,17 @@ public class MyLocationService extends BroadcastReceiver {
                 {
                     Location location = result.getLastLocation();
                     String location_string = new StringBuilder(""+location.getLatitude()).append(", ").append(location.getLongitude()).toString();
+
                     try
                     {
                         AccountActivity.getInstance().updateTextView(location_string);
+                        AccountActivity.getInstance().storeToFireBase(location.getLatitude(),location.getLongitude());
 
                     }
 
                     catch (Exception e)
                     {
-                        Toast.makeText(context, location_string,Toast.LENGTH_SHORT).show();
+                        Toast.makeText(context, location_string, LENGTH_SHORT).show();
                     }
 
                 }
